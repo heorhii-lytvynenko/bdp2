@@ -1,41 +1,16 @@
-#!/usr/bin/env python
+def merge_values(x, y):
+    # Merge two partial aggregates of the same marsrutas.
+    zonos = dict(x[2])
+    for zona, kiekis in y[2].items():
+        zonos[zona] = zonos.get(zona, 0) + kiekis
 
-import sys
+    return (x[0] + y[0], x[1] + y[1], zonos)
 
-sys.stdin = open("smapout.txt","r")
-sys.stdout = open("redout.txt","w")
 
-current_diena = None
-current_count = 0
-diena = None
-
-# input comes from STDIN
-for line in sys.stdin:
-    # remove leading and trailing whitespace
-    line = line.strip()
-
-    # parse the input we got from mapper.py
-    diena, count = line.split('\t', 1)
-
-    # convert count (currently a string) to int
-    try:
-        count = int(count)
-    except ValueError:
-        # count was not a number, so silently
-        # ignore/discard this line
-        continue
-
-    # this IF-switch only works because Hadoop sorts map output
-    # by key (here: word) before it is passed to the reducer
-    if current_diena == diena:
-        current_count += count
-    else:
-        if current_diena != None:
-            # write result to STDOUT
-            print ('%s\t%s' % (current_diena, current_count))
-        current_count = count
-        current_diena = diena
-
-# do not forget to output the last word if needed!
-if current_diena != None:
-    print ('%s\t%s' % (current_diena, current_count))
+def print_result(rows, zone_columns):
+    print("\t".join(["marsrutas", "svoris_sum", "siuntu_skaicius_sum"] + zone_columns))
+    for marsrutas, values in rows:
+        row = [marsrutas, format(values[0], "g"), str(values[1])]
+        for zona in zone_columns:
+            row.append(str(values[2].get(zona, 0)))
+        print("\t".join(row))
