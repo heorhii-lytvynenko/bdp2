@@ -3,7 +3,7 @@ from red import merge_values, print_result
 from Sort import sort_result
 
 
-INPUT_PATH = "duom_cut.txt"
+INPUT_PATH = "duom_full.txt"
 
 
 def get_spark_context():
